@@ -1,9 +1,8 @@
 const std = @import("std");
 const lightmix = @import("lightmix");
-const seventh_chords = @import("seventh-chords");
+const filters = @import("lightmix_filters");
 
 const Wave = lightmix.Wave;
-const Scale = seventh_chords.Scale;
 
 pub fn main() !void {
     const allocator = std.heap.page_allocator;

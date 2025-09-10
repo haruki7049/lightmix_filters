@@ -21,12 +21,12 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
     exe_mod.addImport("lightmix", lightmix.module("lightmix"));
-    exe_mod.addImport("lightmix_template", lib_mod);
+    exe_mod.addImport("lightmix_filters", lib_mod);
 
     // Install
     const lib = b.addLibrary(.{
         .linkage = .static,
-        .name = "lightmix_template",
+        .name = "lightmix_filters",
         .root_module = lib_mod,
     });
     lib.linkLibC();
@@ -35,7 +35,7 @@ pub fn build(b: *std.Build) void {
     b.installArtifact(lib);
 
     const exe = b.addExecutable(.{
-        .name = "lightmix_template",
+        .name = "lightmix_filters",
         .root_module = exe_mod,
     });
     b.installArtifact(exe);

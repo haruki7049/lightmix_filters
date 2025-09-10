@@ -15,7 +15,7 @@ const length: usize = 88200;
 pub fn main() !void {
     const allocator = std.heap.page_allocator;
 
-    const wave: Wave = generate(allocator);
+    const wave: Wave = generate(allocator).filter(filters.volume.decay);
     defer wave.deinit();
 
     var file = try std.fs.cwd().createFile("result.wav", .{});

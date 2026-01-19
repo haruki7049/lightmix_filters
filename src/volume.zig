@@ -64,13 +64,13 @@ pub const cutAttackOptions = struct {
     length: usize = 100,
 };
 
-pub fn cut_attack(comptime T: type, original: Wave(T), options: cutAttackOptions) !Wave(T) {
+pub fn cutAttack(comptime T: type, original: Wave(T), options: cutAttackOptions) !Wave(T) {
     const allocator = original.allocator;
-    var result: std.array_list.Aligned(f128, null) = .empty;
+    var result: std.array_list.Aligned(T, null) = .empty;
 
     for (original.samples, options.start_point..) |sample, n| {
         if (n < options.length) {
-            const percent: f128 = @floatFromInt(n / options.length);
+            const percent: T = @floatFromInt(n / options.length);
             try result.append(allocator, percent * sample);
 
             continue;
@@ -79,11 +79,37 @@ pub fn cut_attack(comptime T: type, original: Wave(T), options: cutAttackOptions
         try result.append(allocator, sample);
     }
 
-    return Wave(f128){
+    return Wave(T){
         .samples = try result.toOwnedSlice(allocator),
         .allocator = allocator,
 
         .sample_rate = original.sample_rate,
         .channels = original.channels,
     };
+}
+
+test "cutAttack" {
+    const test_data = @import("./test_data.zig");
+    const allocator = std.testing.allocator;
+
+    const frequency = 440.0;
+    const sample_rate = 44100.0;
+    const radians_per_sec: f64 = frequency * 2.0 * std.math.pi;
+
+    // Sine wave generation
+    var samples: [44100]f64 = undefined;
+    for (0..samples.len) |i| {
+        const t = @as(f64, @floatFromInt(i)) / sample_rate;
+        samples[i] = 0.5 * @sin(radians_per_sec * t);
+    }
+
+    const wave: Wave(f64) = Wave(f64).init(samples[0..], allocator, .{
+        .sample_rate = 44100,
+        .channels = 1,
+    });
+
+    const filtered_wave: Wave(f64) = wave.filter_with(cutAttackOptions, cutAttack, .{ .start_point = 0 });
+    defer filtered_wave.deinit();
+
+    try std.testing.expectEqualSlices(f64, test_data.cutAttack, filtered_wave.samples);
 }

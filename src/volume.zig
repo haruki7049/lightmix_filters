@@ -24,6 +24,10 @@ pub fn decay(original_wave: Wave) !Wave {
     };
 }
 
+test "decay" {
+    try std.testing.expectEqual(0, 1);
+}
+
 pub fn amp(original_wave: Wave) !Wave {
     var result = std.ArrayList(f32).init(original_wave.allocator);
 

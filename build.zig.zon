@@ -1,7 +1,7 @@
 .{
-    .name = .lightmix_template,
+    .name = .lightmix_filters,
     .version = "0.0.0",
-    .fingerprint = 0xf08dce35b7401a6a,
+    .fingerprint = 0x48ec1d1681fd0540,
     .minimum_zig_version = "0.15.2",
 
     .dependencies = .{

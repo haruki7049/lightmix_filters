@@ -7,29 +7,29 @@ pub const DecayArgs = struct {
     start_point: usize = 0,
 };
 
-pub fn decay(comptime T: type, original_wave: Wave(T), args: DecayArgs) !Wave(T) {
+pub fn decay(comptime T: type, original: Wave(T), args: DecayArgs) !Wave(T) {
     var result_list: std.array_list.Aligned(T, null) = .empty;
 
     // Process each sample, applying a decay factor
-    for (original_wave.samples, args.start_point..) |sample, n| {
+    for (original.samples, args.start_point..) |sample, n| {
         // Calculate how far from the end we are
-        const remaining_samples = original_wave.samples.len - n;
+        const remaining_samples = original.samples.len - n;
 
         // Decay factor: 1.0 at start, 0.0 at end
         const decay_factor = @as(T, @floatFromInt(remaining_samples)) /
-            @as(T, @floatFromInt(original_wave.samples.len));
+            @as(T, @floatFromInt(original.samples.len));
 
         // Apply the decay to the sample
         const decayed_sample = sample * decay_factor;
-        try result_list.append(original_wave.allocator, decayed_sample);
+        try result_list.append(original.allocator, decayed_sample);
     }
 
     // Return a new Wave with the filtered samples
     return Wave(T){
-        .samples = try result_list.toOwnedSlice(original_wave.allocator),
-        .allocator = original_wave.allocator,
-        .sample_rate = original_wave.sample_rate,
-        .channels = original_wave.channels,
+        .samples = try result_list.toOwnedSlice(original.allocator),
+        .allocator = original.allocator,
+        .sample_rate = original.sample_rate,
+        .channels = original.channels,
     };
 }
 
@@ -57,4 +57,33 @@ test "decay" {
     defer decayed_wave.deinit();
 
     try std.testing.expectEqualSlices(f64, test_data.decay, decayed_wave.samples);
+}
+
+pub const cutAttackOptions = struct {
+    start_point: usize = 1,
+    length: usize = 100,
+};
+
+pub fn cut_attack(comptime T: type, original: Wave(T), options: cutAttackOptions) !Wave(T) {
+    const allocator = original.allocator;
+    var result: std.array_list.Aligned(f128, null) = .empty;
+
+    for (original.samples, options.start_point..) |sample, n| {
+        if (n < options.length) {
+            const percent: f128 = @floatFromInt(n / options.length);
+            try result.append(allocator, percent * sample);
+
+            continue;
+        }
+
+        try result.append(allocator, sample);
+    }
+
+    return Wave(f128){
+        .samples = try result.toOwnedSlice(allocator),
+        .allocator = allocator,
+
+        .sample_rate = original.sample_rate,
+        .channels = original.channels,
+    };
 }

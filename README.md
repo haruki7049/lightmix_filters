@@ -2,8 +2,8 @@
 
 ## Zig version
 
-0.14.1
+0.15.2
 
 ## lightmix version
 
-0.3.1
+0.14.1

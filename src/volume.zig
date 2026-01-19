@@ -3,11 +3,15 @@ const lightmix = @import("lightmix");
 
 const Wave = lightmix.Wave;
 
-pub fn decay(comptime T: type, original_wave: Wave(T)) !Wave(T) {
+pub const DecayArgs = struct {
+    start_point: usize = 0,
+};
+
+pub fn decay(comptime T: type, original_wave: Wave(T), args: DecayArgs) !Wave(T) {
     var result_list: std.array_list.Aligned(T, null) = .empty;
 
     // Process each sample, applying a decay factor
-    for (original_wave.samples, 0..) |sample, n| {
+    for (original_wave.samples, args.start_point..) |sample, n| {
         // Calculate how far from the end we are
         const remaining_samples = original_wave.samples.len - n;
 
@@ -49,7 +53,7 @@ test "decay" {
         .channels = 1,
     });
 
-    const decayed_wave: Wave(f64) = wave.filter(decay);
+    const decayed_wave: Wave(f64) = wave.filter_with(DecayArgs, decay, .{ .start_point = 0 });
     defer decayed_wave.deinit();
 
     try std.testing.expectEqualSlices(f64, test_data.decay, decayed_wave.samples);

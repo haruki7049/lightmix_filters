@@ -59,12 +59,12 @@ test "decay" {
     try std.testing.expectEqualSlices(f64, test_data.decay, decayed_wave.samples);
 }
 
-pub const cutAttackOptions = struct {
+pub const CutAttackArgs = struct {
     start_point: usize = 1,
     length: usize = 100,
 };
 
-pub fn cutAttack(comptime T: type, original: Wave(T), options: cutAttackOptions) !Wave(T) {
+pub fn cutAttack(comptime T: type, original: Wave(T), options: CutAttackArgs) !Wave(T) {
     const allocator = original.allocator;
     var result: std.array_list.Aligned(T, null) = .empty;
 
@@ -108,7 +108,7 @@ test "cutAttack" {
         .channels = 1,
     });
 
-    const filtered_wave: Wave(f64) = wave.filter_with(cutAttackOptions, cutAttack, .{ .start_point = 0 });
+    const filtered_wave: Wave(f64) = wave.filter_with(CutAttackArgs, cutAttack, .{ .start_point = 0 });
     defer filtered_wave.deinit();
 
     try std.testing.expectEqualSlices(f64, test_data.cutAttack, filtered_wave.samples);

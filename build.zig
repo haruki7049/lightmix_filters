@@ -8,7 +8,7 @@ pub fn build(b: *std.Build) void {
     const lightmix = b.dependency("lightmix", .{});
 
     // Modules
-    const mod = b.createModule(.{
+    const mod = b.addModule("lightmix_filters", .{
         .root_source_file = b.path("src/root.zig"),
         .target = target,
         .optimize = optimize,

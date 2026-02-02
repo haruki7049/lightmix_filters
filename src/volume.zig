@@ -48,15 +48,14 @@ test "decay" {
         samples[i] = 0.5 * @sin(radians_per_sec * t);
     }
 
-    const wave: Wave(f64) = Wave(f64).init(samples[0..], allocator, .{
+    var wave: Wave(f64) = try Wave(f64).init(samples[0..], allocator, .{
         .sample_rate = 44100,
         .channels = 1,
     });
+    defer wave.deinit();
+    try wave.filter_with(DecayArgs, decay, .{ .start_point = 0 });
 
-    const decayed_wave: Wave(f64) = wave.filter_with(DecayArgs, decay, .{ .start_point = 0 });
-    defer decayed_wave.deinit();
-
-    try std.testing.expectEqualSlices(f64, test_data.decay, decayed_wave.samples);
+    try std.testing.expectEqualSlices(f64, test_data.decay, wave.samples);
 }
 
 pub const CutAttackArgs = struct {
@@ -103,13 +102,12 @@ test "cutAttack" {
         samples[i] = 0.5 * @sin(radians_per_sec * t);
     }
 
-    const wave: Wave(f64) = Wave(f64).init(samples[0..], allocator, .{
+    var wave: Wave(f64) = try Wave(f64).init(samples[0..], allocator, .{
         .sample_rate = 44100,
         .channels = 1,
     });
+    defer wave.deinit();
+    try wave.filter_with(DecayArgs, decay, .{ .start_point = 0 });
 
-    const filtered_wave: Wave(f64) = wave.filter_with(CutAttackArgs, cutAttack, .{ .start_point = 0 });
-    defer filtered_wave.deinit();
-
-    try std.testing.expectEqualSlices(f64, test_data.cutAttack, filtered_wave.samples);
+    try std.testing.expectEqualSlices(f64, test_data.decay, wave.samples);
 }

@@ -1,6 +1,6 @@
 .{
     .name = .lightmix_filters,
-    .version = "0.3.0",
+    .version = "0.4.0",
     .fingerprint = 0x48ec1d1681fd0540,
     .minimum_zig_version = "0.15.2",
 

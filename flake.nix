@@ -56,6 +56,11 @@
               # Music Player
               pkgs.sox # Use this command as: `play result.wav`
             ];
+
+            shellHook = ''
+              # Remove NIX_CFLAGS_COMPILE
+              unset NIX_CFLAGS_COMPILE
+            '';
           };
         };
     };

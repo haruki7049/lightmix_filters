@@ -6,4 +6,4 @@
 
 ## lightmix version
 
-0.16.1
+0.18.0
